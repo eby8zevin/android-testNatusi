@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Apotik</string>
+
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+
+    <string name="add_data">Add Data</string>
+    <string name="name">Name</string>
+    <string name="category">Category</string>
+    <string name="stock">Stock</string>
+    <string name="price">Price</string>
+    <string name="want_to_delete">Want to delete Data?</string>
+
+    <string name="id_obat">ID Obat</string>
+    <string name="name_obat">Name Obat</string>
+    <string name="category_obat">Category Obat</string>
+    <string name="stock_obat">Stock Obat</string>
+    <string name="price_obat">Price Obat</string>
+    <string name="save">Save</string>
+</resources>
