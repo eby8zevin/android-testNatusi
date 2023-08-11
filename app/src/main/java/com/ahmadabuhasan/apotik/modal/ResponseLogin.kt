@@ -38,8 +38,8 @@ data class DataLogin(
     val token: String,
 
     @SerializedName("created_at")
-    val createdAt: String? = null,
+    val createdAt: String?,
 
     @SerializedName("updated_at")
-    val updatedAt: String? = null
+    val updatedAt: String?
 )
