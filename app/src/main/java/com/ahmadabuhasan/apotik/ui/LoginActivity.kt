@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.util.Log
 import android.util.Patterns
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.ahmadabuhasan.apotik.R
 import com.ahmadabuhasan.apotik.api.ApiConfig
 import com.ahmadabuhasan.apotik.databinding.ActivityLoginBinding
 import com.ahmadabuhasan.apotik.modal.ResponseLogin
@@ -19,6 +21,10 @@ import retrofit2.Response
 
 class LoginActivity : AppCompatActivity() {
 
+    companion object {
+        private const val TAG = "LoginActivity"
+    }
+
     private lateinit var binding: ActivityLoginBinding
     private lateinit var sessionManager: SessionManager
 
@@ -29,6 +35,8 @@ class LoginActivity : AppCompatActivity() {
 
         sessionManager = SessionManager(this)
 
+        binding.etEmail.setText(getString(R.string.email_value))
+        binding.etPassword.setText(getString(R.string.password_value))
         binding.btnLogin.setOnClickListener { checkLogin() }
     }
 
@@ -65,51 +73,48 @@ class LoginActivity : AppCompatActivity() {
         apiService.enqueue(object : Callback<ResponseLogin> {
             override fun onResponse(call: Call<ResponseLogin>, response: Response<ResponseLogin>) {
                 showLoading(false)
-                if (response.isSuccessful) {
+                val responseBody = response.body()
+                if (response.isSuccessful && responseBody != null) {
 
-                    val responseBody = response.body()!!
+                    if (responseBody.code == 200) {
 
-                    when (val statusCode = response.code()) {
-                        200 -> {
-                            Toasty.success(
-                                this@LoginActivity,
-                                responseBody.message,
-                                Toasty.LENGTH_SHORT, true
-                            ).show()
+                        val dataLogin = responseBody.data
 
-                            sessionManager.apply {
-                                setBooleanPref(KEY_IS_LOGIN, true)
-                                setStringPref(KEY_TOKEN, responseBody.data.token)
-                            }
-
-                            val i = Intent(this@LoginActivity, MainActivity::class.java)
-                            i.flags =
-                                Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                            startActivity(i)
+                        sessionManager.apply {
+                            setBooleanPref(KEY_IS_LOGIN, true)
+                            setStringPref(KEY_TOKEN, dataLogin.token)
                         }
 
-                        500 -> {
-                            Toasty.error(
-                                this@LoginActivity,
-                                responseBody.message,
-                                Toasty.LENGTH_SHORT, true
-                            ).show()
-                        }
-
-                        else -> {
-                            Log.d("Response Code", "Other response code: $statusCode")
-                        }
+                        val i = Intent(this@LoginActivity, MainActivity::class.java)
+                        i.flags =
+                            Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                        startActivity(i)
+                        Toasty.success(
+                            this@LoginActivity,
+                            responseBody.message,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        Toasty.error(
+                            this@LoginActivity,
+                            responseBody.message,
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
 
             override fun onFailure(call: Call<ResponseLogin>, t: Throwable) {
                 showLoading(false)
-                Log.e("Network Error", t.message.toString())
+                Log.e(TAG, "onFailure: ${t.message.toString()}")
+                Toasty.error(
+                    this@LoginActivity,
+                    "Akun Yang Anda Masukkan Tidak Terdaftar",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         })
     }
-
 
     private fun showLoading(isLoading: Boolean) {
         if (isLoading) {
