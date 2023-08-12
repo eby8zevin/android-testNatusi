@@ -1,10 +1,8 @@
 package com.ahmadabuhasan.apotik.adapter
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
-import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -13,8 +11,7 @@ import com.ahmadabuhasan.apotik.R
 import com.ahmadabuhasan.apotik.api.ApiConfig
 import com.ahmadabuhasan.apotik.databinding.ItemObatBinding
 import com.ahmadabuhasan.apotik.modal.ListObat
-import com.ahmadabuhasan.apotik.modal.ResponseDefault
-import com.ahmadabuhasan.apotik.ui.MainActivity
+import com.ahmadabuhasan.apotik.modal.ResponseDelete
 import es.dmoral.toasty.Toasty
 import retrofit2.Call
 import retrofit2.Callback
@@ -40,8 +37,6 @@ class AdapterObat(
         }
     }
 
-    override fun getItemCount(): Int = obatList.size
-
     inner class ObatViewHolder(private val binding: ItemObatBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(obat: ListObat) {
@@ -61,7 +56,7 @@ class AdapterObat(
                     append(obat.priceObat)
                 }
 
-                ivDelete.setOnClickListener { deleteData(obat.idObat) }
+                ivDelete.setOnClickListener { deleteData(obat.idObat, adapterPosition) }
             }
 
             itemView.setOnClickListener {
@@ -70,6 +65,8 @@ class AdapterObat(
         }
     }
 
+    override fun getItemCount(): Int = obatList.size
+
     @SuppressLint("NotifyDataSetChanged")
     fun setData(data: ArrayList<ListObat>) {
         obatList.clear()
@@ -77,48 +74,31 @@ class AdapterObat(
         notifyDataSetChanged()
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    fun clearData() {
-        obatList.clear()
-        notifyDataSetChanged()
-    }
-
-    private fun deleteData(id: Int) {
+    private fun deleteData(id: Int, position: Int) {
         AlertDialog.Builder(context)
             .setMessage(R.string.want_to_delete)
             .setCancelable(false)
             .setPositiveButton("Yes") { dialogInterface, _ ->
                 val apiService = ApiConfig.getApiService().deleteObat(token, id)
-                apiService.enqueue(object : Callback<ResponseDefault> {
-                    @SuppressLint("NotifyDataSetChanged")
+                apiService.enqueue(object : Callback<ResponseDelete> {
                     override fun onResponse(
-                        call: Call<ResponseDefault>,
-                        response: Response<ResponseDefault>
+                        call: Call<ResponseDelete>,
+                        response: Response<ResponseDelete>
                     ) {
-                        if (response.isSuccessful) {
-                            val responseBody = response.body()!!
-
+                        val responseBody = response.body()
+                        if (response.isSuccessful && responseBody != null) {
                             Toasty.success(
                                 context,
                                 responseBody.message,
                                 Toasty.LENGTH_SHORT,
                                 true
                             ).show()
-
-                            obatList.remove(responseBody.data)
-                            notifyItemRemoved(id)
-                            clearData()
-
-                            context as Activity
-                            this@AdapterObat.context.finish()
-                            this@AdapterObat.context.startActivity(context.intent)
-                            val i = Intent(context, MainActivity::class.java)
-                            context.startActivity(i)
-                            context.finish()
+                            obatList.removeAt(position)
+                            notifyItemRemoved(position)
                         }
                     }
 
-                    override fun onFailure(call: Call<ResponseDefault>, t: Throwable) {
+                    override fun onFailure(call: Call<ResponseDelete>, t: Throwable) {
                         dialogInterface.cancel()
                         Log.e("Network Error", t.message.toString())
                     }
