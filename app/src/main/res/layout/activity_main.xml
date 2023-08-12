@@ -38,8 +38,8 @@
             android:clickable="true"
             android:contentDescription="@string/add_data"
             android:focusable="true"
-            android:tint="@android:color/white"
-            app:backgroundTint="?android:attr/colorAccent"
+            android:tint="@color/white"
+            app:backgroundTint="?android:attr/colorPrimary"
             app:srcCompat="@drawable/ic_add" />
     </LinearLayout>
 
