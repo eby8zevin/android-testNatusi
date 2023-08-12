@@ -1,6 +1,7 @@
 package com.ahmadabuhasan.apotik.api
 
 import com.ahmadabuhasan.apotik.modal.ResponseDefault
+import com.ahmadabuhasan.apotik.modal.ResponseDelete
 import com.ahmadabuhasan.apotik.modal.ResponseGetObat
 import com.ahmadabuhasan.apotik.modal.ResponseLogin
 import retrofit2.Call
@@ -39,5 +40,5 @@ interface ApiService {
     fun deleteObat(
         @Field("token") token: String,
         @Field("id_obat") idObat: Int
-    ): Call<ResponseDefault>
+    ): Call<ResponseDelete>
 }
