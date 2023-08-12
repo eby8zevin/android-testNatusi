@@ -36,7 +36,6 @@ class MainActivity : AppCompatActivity() {
         binding.rvObat.layoutManager = LinearLayoutManager(this)
         binding.rvObat.setHasFixedSize(true)
         adapter = AdapterObat(this, arrayListOf(), token.toString())
-        adapter.notifyDataSetChanged()
         binding.rvObat.adapter = adapter
         getObat(token.toString())
 
