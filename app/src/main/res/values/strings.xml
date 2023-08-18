@@ -20,4 +20,5 @@
     <string name="stock_obat">Stock Obat</string>
     <string name="price_obat">Price Obat</string>
     <string name="save">Save</string>
+    <string name="logout">Logout</string>
 </resources>
